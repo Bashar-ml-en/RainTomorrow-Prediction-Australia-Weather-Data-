@@ -1,0 +1,28 @@
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Testing and Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local databases
+data/*.db
+data/*.sqlite
+mlflow.db
+
+# MLflow run directories
+mlruns/
+
+# IDE configuration
+.vscode/
+.idea/
+
+# Environment files
+.env
+venv/
+ENV/
+env/

@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semenanjung & Borneo Hourly Weather Forecaster</title>
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Theme Variables Configuration */
+        :root {
+            --transition-speed: 0.4s;
+            --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Webkit Scrollbars Customization */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--card-border);
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan);
+        }
+
+        /* 1. Sleek Dark Mode (Default) */
+        body.theme-dark {
+            --bg-color: #07080f;
+            --bg-gradient: radial-gradient(circle at 10% 20%, rgba(127, 0, 255, 0.12) 0%, transparent 40%),
+                           radial-gradient(circle at 90% 80%, rgba(0, 242, 254, 0.08) 0%, transparent 45%);
+            --card-bg: rgba(16, 17, 33, 0.55);
+            --card-border: rgba(255, 255, 255, 0.07);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-cyan: #00f2fe;
+            --accent-blue: #4facfe;
+            --glow-color: rgba(0, 242, 254, 0.25);
+            --gauge-bg: rgba(255, 255, 255, 0.04);
+            --shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+            --card-hover-bg: rgba(255, 255, 255, 0.04);
+            --active-gradient: linear-gradient(135deg, rgba(0, 242, 254, 0.12), rgba(79, 172, 254, 0.12));
+            --rain-color: #38bdf8;
+            --sun-color: #f59e0b;
+        }
+
+        /* 2. Radiant Light Mode */
+        body.theme-light {
+            --bg-color: #f4f7fc;
+            --bg-gradient: radial-gradient(circle at 15% 15%, rgba(79, 172, 254, 0.08) 0%, transparent 35%),
+                           radial-gradient(circle at 85% 85%, rgba(127, 0, 255, 0.05) 0%, transparent 35%);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(0, 0, 0, 0.07);
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --accent-cyan: #0284c7;
+            --accent-blue: #0f172a;
+            --glow-color: rgba(14, 165, 233, 0.15);
+            --gauge-bg: rgba(0, 0, 0, 0.05);
+            --shadow: 0 15px 35px rgba(31, 41, 55, 0.05);
+            --card-hover-bg: rgba(0, 0, 0, 0.02);
+            --active-gradient: linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(15, 23, 42, 0.04));
+            --rain-color: #0284c7;
+            --sun-color: #d97706;
+        }
+
+        /* 3. Cyber Neon Custom Mode */
+        body.theme-custom {
+            --bg-color: #06020c;
+            --bg-gradient: radial-gradient(circle at 50% 10%, rgba(255, 0, 127, 0.15) 0%, transparent 50%),
+                           radial-gradient(circle at 90% 90%, rgba(127, 0, 255, 0.12) 0%, transparent 40%);
+            --card-bg: rgba(19, 9, 38, 0.75);
+            --card-border: rgba(255, 0, 127, 0.15);
+            --text-primary: #fff0f5;
+            --text-secondary: #a78bfa;
+            --accent-cyan: #ff007f;
+            --accent-blue: #7f00ff;
+            --glow-color: rgba(255, 0, 127, 0.3);
+            --gauge-bg: rgba(255, 255, 255, 0.03);
+            --shadow: 0 20px 45px rgba(255, 0, 127, 0.1);
+            --card-hover-bg: rgba(255, 0, 127, 0.04);
+            --active-gradient: linear-gradient(135deg, rgba(255, 0, 127, 0.15), rgba(127, 0, 255, 0.15));
+            --rain-color: #ff007f;
+            --sun-color: #f43f5e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 2.5rem;
+            transition: background-color var(--transition-speed) var(--transition-easing),
+                        background-image var(--transition-speed) var(--transition-easing),
+                        color var(--transition-speed) var(--transition-easing);
+        }
+
+        /* Responsive Layout Container */
+        .app-container {
+            max-width: 1600px;
+            width: 100%;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 310px 1fr;
+            gap: 2.5rem;
+        }
+
+        @media (max-width: 1200px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            body {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Sidebar Container */
+        .sidebar {
+            background: var(--card-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            height: fit-content;
+            box-shadow: var(--shadow);
+            transition: all var(--transition-speed) var(--transition-easing);
+        }
+
+        .header-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.7rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: -0.5rem;
+            line-height: 1.5;
+        }
+
+        /* Theme Segmented Selector */
+        .theme-switcher-wrapper {
+            background: rgba(0, 0, 0, 0.08);
+            border-radius: 14px;
+            padding: 4px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+        }
+
+        body.theme-light .theme-switcher-wrapper {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .theme-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .theme-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .theme-btn.active {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--accent-cyan);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* City Navigation Cards */
+        .city-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .city-card {
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 18px;
+            padding: 1.15rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .city-card:hover {
+            transform: translateY(-2px);
+            background: var(--card-hover-bg);
+            border-color: rgba(255, 0, 127, 0.25);
+            box-shadow: 0 8px 24px var(--glow-color);
+        }
+
+        body.theme-dark .city-card:hover, body.theme-light .city-card:hover {
+            border-color: rgba(0, 242, 254, 0.25);
+        }
+
+        .city-card.active {
+            background: var(--active-gradient);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 24px var(--glow-color);
+        }
+
+        .city-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .city-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 3px;
+        }
+
+        .badge-prediction {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-prediction.rain {
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--rain-color);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+
+        .badge-prediction.norain {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--sun-color);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+
+        /* Main Display Panel */
+        .main-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        /* Hero Active Display Card */
+        .hero-forecast {
+            background: var(--card-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            padding: 3rem;
+            display: grid;
+            grid-template-columns: 1fr 220px;
+            gap: 2.5rem;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-speed) var(--transition-easing);
+        }
+
+        @media (max-width: 640px) {
+            .hero-forecast {
+                grid-template-columns: 1fr;
+                padding: 2rem;
+            }
+        }
+
+        .hero-content {
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .hero-city-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .hero-city-time {
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .monsoon-badge {
+            display: inline-block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            background: var(--card-hover-bg);
+            border: 1px solid var(--card-border);
+            padding: 5px 14px;
+            border-radius: 20px;
+            width: fit-content;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .forecast-result-wrapper {
+            margin-top: 0.5rem;
+        }
+
+        .forecast-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .forecast-outcome {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.3rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .forecast-outcome.rain {
+            color: var(--rain-color);
+            text-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+        }
+
+        .forecast-outcome.norain {
+            color: var(--sun-color);
+            text-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
+        }
+
+        /* SVG Circular Probability Ring */
+        .gauge-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+            position: relative;
+        }
+
+        .gauge-svg {
+            transform: rotate(-90deg);
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: var(--gauge-bg);
+            stroke-width: 10;
+        }
+
+        .gauge-fill {
+            fill: none;
+            stroke: url(#neon-gradient);
+            stroke-width: 10;
+            stroke-linecap: round;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 1.2s cubic-bezier(0.1, 0.8, 0.25, 1);
+        }
+
+        .gauge-text {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gauge-percentage {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .gauge-title {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 3px;
+            font-weight: 600;
+        }
+
+        /* Hourly Probability Bar Chart Timeline */
+        .timeline-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 180px;
+            padding: 1.5rem 0.5rem 0.5rem 0.5rem;
+            background: rgba(0, 0, 0, 0.12);
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            gap: 6px;
+            overflow-x: auto;
+        }
+
+        body.theme-light .chart-container {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .chart-bar-wrapper {
+            flex: 1;
+            min-width: 32px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            cursor: pointer;
+            gap: 8px;
+            position: relative;
+        }
+
+        .chart-bar-container {
+            width: 100%;
+            height: 120px;
+            display: flex;
+            align-items: flex-end;
+            position: relative;
+        }
+
+        .chart-bar {
+            width: 100%;
+            background: linear-gradient(to top, var(--accent-blue), var(--accent-cyan));
+            border-radius: 6px 6px 0 0;
+            height: 0%;
+            transition: height 1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .chart-bar-wrapper:hover .chart-bar {
+            box-shadow: 0 0 16px var(--glow-color);
+            filter: brightness(1.1);
+        }
+
+        .chart-bar-wrapper.active .chart-bar {
+            background: linear-gradient(to top, var(--accent-cyan), #ffffffaa);
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+
+        body.theme-custom .chart-bar-wrapper.active .chart-bar {
+            background: linear-gradient(to top, var(--accent-cyan), var(--accent-blue));
+        }
+
+        .chart-bar-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .chart-bar-time {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-tooltip {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-color);
+            border: 1px solid var(--card-border);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+            color: var(--text-primary);
+            z-index: 10;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-bar-wrapper:hover .chart-tooltip {
+            opacity: 1;
+        }
+
+        /* Climate Metrics Dial Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--card-border);
+            border-radius: 22px;
+            padding: 1.6rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            transition: all var(--transition-speed) var(--transition-easing);
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* History Table Archive Panel */
+        .history-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            transition: all var(--transition-speed) var(--transition-easing);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.75rem;
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: #07080f;
+            border: none;
+            font-weight: 700;
+            padding: 10px 20px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            width: 100%;
+            border-radius: 14px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 800px; /* Force table scrolling within cards, preventing dashboard cutoff */
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            padding: 14px 18px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid var(--card-border);
+            font-weight: 700;
+        }
+
+        td {
+            padding: 16px 18px;
+            font-size: 0.95rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            transition: background-color 0.3s ease;
+        }
+
+        body.theme-light td {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.015);
+        }
+
+        body.theme-light tr:hover td {
+            background: rgba(0, 0, 0, 0.01);
+        }
+
+        .icon-svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            stroke-width: 2.5;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+    </style>
+</head>
+<body class="theme-dark">
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div>
+                <h1 class="header-title">
+                    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/><circle cx="12" cy="12" r="4"/></svg>
+                    MET-MALAYSIA
+                </h1>
+                <p class="header-desc">Hobby Hourly Rainfall Forecaster powered by localized Random Forest models.</p>
+            </div>
+            
+            <!-- Multi-Theme Selector Segment -->
+            <div class="theme-switcher-wrapper">
+                <button class="theme-btn active" id="btnDark" onclick="changeTheme('dark')">
+                    🌙 Dark
+                </button>
+                <button class="theme-btn" id="btnLight" onclick="changeTheme('light')">
+                    ☀️ Light
+                </button>
+                <button class="theme-btn" id="btnCustom" onclick="changeTheme('custom')">
+                    🔮 Cyber
+                </button>
+            </div>
+            
+            <div class="city-list" id="cityList">
+                <!-- Javascript will inject list of cities -->
+            </div>
+        </aside>
+
+        <!-- Main Panel -->
+        <main class="main-panel">
+            <!-- Active Forecast Card -->
+            <div class="hero-forecast" id="heroCard">
+                <div class="hero-content">
+                    <div class="monsoon-badge" id="monsoonBadge">--</div>
+                    <h2 class="hero-city-name">
+                        <span id="cityName">Kuala Lumpur</span>
+                        <span class="hero-city-time" id="activeHourText">00:00</span>
+                    </h2>
+                    
+                    <div class="forecast-result-wrapper">
+                        <p class="forecast-label">Forecast Next Hour</p>
+                        <div class="forecast-outcome" id="predictionOutcome">Loading...</div>
+                    </div>
+                </div>
+                
+                <div class="gauge-wrapper">
+                    <svg class="gauge-svg" width="165" height="165" viewBox="0 0 160 160">
+                        <defs>
+                            <linearGradient id="neon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="var(--accent-cyan)" />
+                                <stop offset="100%" stop-color="var(--accent-blue)" />
+                            </linearGradient>
+                        </defs>
+                        <circle class="gauge-bg" cx="80" cy="80" r="70" />
+                        <circle class="gauge-fill" id="gaugeCircle" cx="80" cy="80" r="70" />
+                    </svg>
+                    <div class="gauge-text">
+                        <span class="gauge-percentage" id="probabilityText">0%</span>
+                        <span class="gauge-title">Probability</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 24h Visual Probability Chart Timeline -->
+            <section class="timeline-section">
+                <div class="timeline-header">
+                    <h3 class="section-title">24-Hour Rain Probability Timeline</h3>
+                </div>
+                <div class="chart-container" id="timelineList">
+                    <!-- Javascript will load hourly bars -->
+                </div>
+            </section>
+
+            <!-- Climate Metrics Dials -->
+            <div class="metrics-grid" id="metricsGrid">
+                <div class="metric-card">
+                    <span class="metric-label">☀️ Temp Value</span>
+                    <span class="metric-value" id="valTemp">--</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">💧 Relative Humidity</span>
+                    <span class="metric-value" id="valHumidity">--</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">🌬️ Wind Speed</span>
+                    <span class="metric-value" id="valWind">--</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">🎈 Surface Pressure</span>
+                    <span class="metric-value" id="valPressure">--</span>
+                </div>
+            </div>
+
+            <!-- History Logs Section -->
+            <section class="history-section">
+                <div class="section-header">
+                    <h2 class="section-title">Prediction Archives (Last 100 Hours)</h2>
+                    <button class="refresh-btn" onclick="triggerForecastFetch()">Run Forecast Update</button>
+                </div>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Forecast Time</th>
+                                <th>City</th>
+                                <th>Temp (°C)</th>
+                                <th>Rain Probability</th>
+                                <th>Predicted State</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody">
+                            <!-- SQLite data will be rendered dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- UI/UX Control Engine -->
+    <script>
+        let citiesData = [];
+        let forecastData = {};
+        let activeCity = "Kuala Lumpur";
+        let activeHourIndex = 0; // Index of current hour of tomorrow (0-23)
+
+        // Theme management
+        function changeTheme(themeName) {
+            document.body.className = `theme-${themeName}`;
+            
+            document.querySelectorAll(".theme-btn").forEach(btn => {
+                btn.classList.remove("active");
+            });
+            
+            if (themeName === 'dark') document.getElementById("btnDark").classList.add("active");
+            if (themeName === 'light') document.getElementById("btnLight").classList.add("active");
+            if (themeName === 'custom') document.getElementById("btnCustom").classList.add("active");
+            
+            localStorage.setItem("weather-theme", themeName);
+        }
+
+        // Initialize preferred theme
+        const savedTheme = localStorage.getItem("weather-theme") || "dark";
+        changeTheme(savedTheme);
+
+        async function initDashboard() {
+            try {
+                // Fetch list of cities
+                const response = await fetch("/api/cities");
+                citiesData = await response.json();
+                
+                // Trigger live forecast prediction
+                await fetchForecast();
+                
+                // Fetch SQLite logs
+                await fetchHistory();
+                
+                // Build Left Sidebar City list
+                renderSidebar();
+                
+                // Load details for Kuala Lumpur
+                updateActiveCityDisplay(activeCity);
+            } catch (err) {
+                console.error("Dashboard initialization failed: ", err);
+            }
+        }
+
+        async function fetchForecast() {
+            try {
+                const response = await fetch("/api/forecast");
+                const data = await response.json();
+                
+                forecastData = {};
+                data.forEach(item => {
+                    forecastData[item.city] = item;
+                });
+            } catch (err) {
+                console.error("Failed to load forecast parameters: ", err);
+            }
+        }
+
+        async function fetchHistory() {
+            try {
+                const response = await fetch("/api/history");
+                const history = await response.json();
+                
+                const tbody = document.getElementById("historyBody");
+                tbody.innerHTML = "";
+                
+                if (history.length === 0) {
+                    tbody.innerHTML = "<tr><td colspan='6' style='text-align: center; color: var(--text-secondary);'>No forecast archives found. Click 'Run Forecast Update'.</td></tr>";
+                    return;
+                }
+                
+                history.forEach(item => {
+                    const row = document.createElement("tr");
+                    const labelClass = item.predicted_rain_next_hour === 1 ? "rain" : "norain";
+                    const outcomeText = item.predicted_rain_next_hour === 1 ? "Rain" : "Dry";
+                    
+                    row.innerHTML = `
+                        <td>${item.timestamp}</td>
+                        <td>${item.forecast_time}</td>
+                        <td style="font-weight: 600;">${item.city}</td>
+                        <td>${item.temperature_2m.toFixed(1)}°C</td>
+                        <td style="font-weight: 600;">${(item.probability * 100).toFixed(1)}%</td>
+                        <td><span class="badge-prediction ${labelClass}">${outcomeText}</span></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error("Failed to fetch SQLite archive data: ", err);
+            }
+        }
+
+        function renderSidebar() {
+            const list = document.getElementById("cityList");
+            list.innerHTML = "";
+            
+            citiesData.forEach(city => {
+                const cityFc = forecastData[city.name] || {};
+                const hourlyRecs = cityFc.hourly_records || [];
+                
+                // If any hour is predicted to rain, show rain badge in list
+                const anyRain = hourlyRecs.some(r => r.predicted_rain_next_hour === 1);
+                const outcomeText = anyRain ? "Rain" : "Dry";
+                const outcomeClass = anyRain ? "rain" : "norain";
+                
+                const card = document.createElement("div");
+                card.className = `city-card ${city.name === activeCity ? 'active' : ''}`;
+                card.onclick = () => selectCity(city.name);
+                
+                card.innerHTML = `
+                    <div class="city-info">
+                        <h3>${city.name}</h3>
+                        <p>Lat: ${city.latitude.toFixed(2)}, Lon: ${city.longitude.toFixed(2)}</p>
+                    </div>
+                    ${outcomeText ? `<span class="badge-prediction ${outcomeClass}">${outcomeText}</span>` : ""}
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function selectCity(cityName) {
+            activeCity = cityName;
+            activeHourIndex = 0; // reset active hour to start of day
+            
+            // Re-render sidebar highlights
+            const cards = document.querySelectorAll(".city-card");
+            cards.forEach(card => {
+                const h3 = card.querySelector("h3");
+                if (h3.innerText === cityName) {
+                    card.classList.add("active");
+                } else {
+                    card.classList.remove("active");
+                }
+            });
+            
+            // Update Active Display with fade effect
+            const hero = document.getElementById("heroCard");
+            hero.style.opacity = 0;
+            setTimeout(() => {
+                updateActiveCityDisplay(cityName);
+                hero.style.opacity = 1;
+            }, 200);
+        }
+
+        function getWmoWeatherDetails(code) {
+            if (code === undefined || code === null) {
+                return { icon: "☀️", desc: "Clear Sky" };
+            }
+            if (code === 0) {
+                return { icon: "☀️", desc: "Clear Sky" };
+            } else if ([1, 2, 3].includes(code)) {
+                return { icon: "⛅", desc: "Partly Cloudy" };
+            } else if ([45, 48].includes(code)) {
+                return { icon: "🌫️", desc: "Foggy" };
+            } else if ([51, 53, 55, 56, 57].includes(code)) {
+                return { icon: "🌧️", desc: "Tropical Drizzle" };
+            } else if ([61, 63, 65, 66, 67].includes(code)) {
+                return { icon: "🌧️⛈️", desc: "Heavy Rain" };
+            } else if ([71, 73, 75, 77, 85, 86].includes(code)) {
+                return { icon: "🌨️", desc: "Cold Precipitation" };
+            } else if ([80, 81, 82].includes(code)) {
+                return { icon: "🌧️⛈️", desc: "Passing Showers" };
+            } else if ([95, 96, 99].includes(code)) {
+                return { icon: "⛈️🌩️", desc: "Thunderstorm" };
+            } else {
+                return { icon: "⛅", desc: "Unsettled" };
+            }
+        }
+
+        function renderHourlyTimeline(cityFc) {
+            const list = document.getElementById("timelineList");
+            list.innerHTML = "";
+            
+            const hourlyRecs = cityFc.hourly_records || [];
+            hourlyRecs.forEach((hour, idx) => {
+                const wrapper = document.createElement("div");
+                wrapper.className = `chart-bar-wrapper ${idx === activeHourIndex ? 'active' : ''}`;
+                wrapper.onclick = () => selectHour(idx);
+                
+                const dt = new Date(hour.forecast_time);
+                const timeStr = dt.toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit', hour12: false });
+                
+                const wmo = getWmoWeatherDetails(hour.weather_code);
+                const probVal = Math.round(hour.probability * 100);
+                
+                // We draw the vertical bar proportional to rain probability percentage
+                wrapper.innerHTML = `
+                    <div class="chart-tooltip">${wmo.icon} ${wmo.desc}</div>
+                    <div class="chart-bar-container">
+                        <div class="chart-bar" style="height: ${probVal}%;"></div>
+                    </div>
+                    <span class="chart-bar-label">${probVal}%</span>
+                    <span class="chart-bar-time">${timeStr.split(':')[0]}h</span>
+                `;
+                list.appendChild(wrapper);
+            });
+        }
+
+        function selectHour(idx) {
+            activeHourIndex = idx;
+            
+            // Update timeline selection style
+            document.querySelectorAll(".chart-bar-wrapper").forEach((pill, i) => {
+                if (i === idx) {
+                    pill.classList.add("active");
+                } else {
+                    pill.classList.remove("active");
+                }
+            });
+            
+            updateHourlyDetailDisplay(activeCity, idx);
+        }
+
+        function updateActiveCityDisplay(cityName) {
+            const cityFc = forecastData[cityName];
+            
+            const nameEl = document.getElementById("cityName");
+            const monsoonEl = document.getElementById("monsoonBadge");
+            
+            nameEl.innerText = cityName;
+            
+            if (!cityFc) {
+                monsoonEl.innerText = "--";
+                document.getElementById("predictionOutcome").innerText = "No Data Found";
+                document.getElementById("probabilityText").innerText = "--";
+                document.getElementById("gaugeCircle").style.strokeDashoffset = 440;
+                
+                // Clear active dials and timelines
+                document.getElementById("timelineList").innerHTML = "<div style='color: var(--text-secondary); padding: 1.5rem; text-align: center; width: 100%;'>No forecast timeline available.</div>";
+                document.getElementById("valTemp").innerText = "--";
+                document.getElementById("valHumidity").innerText = "--";
+                document.getElementById("valWind").innerText = "--";
+                document.getElementById("valPressure").innerText = "--";
+                return;
+            }
+            
+            monsoonEl.innerText = cityFc.monsoon_period;
+            
+            // Render 24 hour pills list
+            renderHourlyTimeline(cityFc);
+            
+            // Render current selected hour details
+            updateHourlyDetailDisplay(cityName, activeHourIndex);
+        }
+
+        function updateHourlyDetailDisplay(cityName, idx) {
+            const cityFc = forecastData[cityName];
+            if (!cityFc) return;
+            
+            const hour = cityFc.hourly_records[idx];
+            if (!hour) return;
+            
+            const outcomeEl = document.getElementById("predictionOutcome");
+            const probText = document.getElementById("probabilityText");
+            const circle = document.getElementById("gaugeCircle");
+            const timeText = document.getElementById("activeHourText");
+            
+            const tempVal = document.getElementById("valTemp");
+            const humVal = document.getElementById("valHumidity");
+            const windVal = document.getElementById("valWind");
+            const pressVal = document.getElementById("valPressure");
+            
+            const dt = new Date(hour.forecast_time);
+            timeText.innerText = dt.toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit', hour12: false });
+            
+            const wmo = getWmoWeatherDetails(hour.weather_code);
+            const formattedDesc = wmo.desc.toUpperCase();
+            
+            if (hour.predicted_rain_next_hour === 1) {
+                outcomeEl.innerText = `🌧️ ${formattedDesc}`;
+                outcomeEl.className = "forecast-outcome rain";
+            } else {
+                outcomeEl.innerText = `${wmo.icon} ${formattedDesc}`;
+                outcomeEl.className = "forecast-outcome norain";
+            }
+            
+            const probPercent = Math.round(hour.probability * 100);
+            probText.innerText = `${probPercent}%`;
+            
+            const offset = 440 - (440 * hour.probability);
+            circle.style.strokeDashoffset = offset;
+            
+            // Update metric dials
+            tempVal.innerText = `${hour.temperature_2m.toFixed(1)}°C`;
+            humVal.innerText = `${Math.round(hour.relative_humidity_2m)}%`;
+            windVal.innerText = `${hour.wind_speed_10m.toFixed(1)} km/h (${Math.round(hour.wind_direction_10m)}°)`;
+            pressVal.innerText = `${Math.round(hour.surface_pressure)} hPa`;
+        }
+
+        async function triggerForecastFetch() {
+            const btn = document.querySelector(".refresh-btn");
+            btn.innerText = "Running Predicts...";
+            btn.disabled = true;
+            
+            try {
+                await fetchForecast();
+                await fetchHistory();
+                renderSidebar();
+                updateActiveCityDisplay(activeCity);
+            } catch (err) {
+                console.error("Manual forecast query failed: ", err);
+            } finally {
+                btn.innerText = "Run Forecast Update";
+                btn.disabled = false;
+            }
+        }
+
+        window.onload = initDashboard;
+    </script>
+</body>
+</html>

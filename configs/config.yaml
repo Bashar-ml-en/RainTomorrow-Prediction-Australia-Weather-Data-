@@ -1,0 +1,55 @@
+# Malaysian Multi-City Rain Prediction Configuration (Hourly Model)
+
+data:
+  archive_api_url: "https://archive-api.open-meteo.com/v1/archive"
+  forecast_api_url: "https://api.open-meteo.com/v1/forecast"
+  start_date: "2016-01-01"
+  end_date: "2026-07-01"
+  cities:
+    - name: "Kuala Lumpur"
+      latitude: 3.1390
+      longitude: 101.6869
+    - name: "Penang"
+      latitude: 5.4141
+      longitude: 100.3288
+    - name: "Johor Bahru"
+      latitude: 1.4927
+      longitude: 103.7414
+    - name: "Kuching"
+      latitude: 1.5533
+      longitude: 110.3592
+    - name: "Kota Kinabalu"
+      latitude: 5.9804
+      longitude: 116.0753
+    - name: "Ipoh"
+      latitude: 4.5975
+      longitude: 101.0901
+    - name: "Kuantan"
+      latitude: 3.8077
+      longitude: 103.3260
+
+features:
+  numerical:
+    - "temperature_2m"
+    - "relative_humidity_2m"
+    - "surface_pressure"
+    - "wind_speed_10m"
+    - "wind_direction_10m"
+    - "rain"
+  categorical:
+    - "city"
+    - "monsoon_period"
+  target: "rain_next_hour"
+
+model:
+  test_size: 0.2
+  random_state: 42
+  grid_search:
+    model__max_depth: [10, 20, null]
+    model__min_samples_split: [2, 5]
+    model__n_estimators: [50, 100]
+
+paths:
+  model_dir: "C:/Users/Bashar/RainToday-Prediction/models"
+  model_path: "C:/Users/Bashar/RainToday-Prediction/models/pipeline.joblib"
+  database_path: "C:/Users/Bashar/RainToday-Prediction/data/predictions.db"
