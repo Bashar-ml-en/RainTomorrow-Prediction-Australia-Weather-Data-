@@ -4,6 +4,10 @@ __pycache__/
 *.pyo
 *.pyd
 
+# JS dependencies
+node_modules/
+**/node_modules/
+
 # Testing and Coverage
 .pytest_cache/
 .coverage
